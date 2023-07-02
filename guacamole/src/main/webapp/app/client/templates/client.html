@@ -1,0 +1,458 @@
+
+<guac-viewport>
+
+    <div id="floating-menu-container" ng-class="{open: !menu.shown, close: menu.shown}" >
+        <div id="floating-menu-logo" style="background: rgb(33, 150, 243); opacity: 0.8; border-radius: 100px;">
+            <svg id="floating-menu-open" ng-click="openMenu()"  class="svg-icon" viewBox="0 0 20 20">
+                <path d="M10,1.445c-4.726,0-8.555,3.829-8.555,8.555c0,4.725,3.829,8.555,8.555,8.555c4.725,0,8.555-3.83,8.555-8.555C18.555,5.274,14.725,1.445,10,1.445 M10,17.654c-4.221,0-7.654-3.434-7.654-7.654c0-4.221,3.433-7.654,7.654-7.654c4.222,0,7.654,3.433,7.654,7.654C17.654,14.221,14.222,17.654,10,17.654 M14.39,10c0,0.248-0.203,0.45-0.45,0.45H6.06c-0.248,0-0.45-0.203-0.45-0.45s0.203-0.45,0.45-0.45h7.879C14.187,9.55,14.39,9.752,14.39,10 M14.39,12.702c0,0.247-0.203,0.449-0.45,0.449H6.06c-0.248,0-0.45-0.202-0.45-0.449c0-0.248,0.203-0.451,0.45-0.451h7.879C14.187,12.251,14.39,12.454,14.39,12.702 M14.39,7.298c0,0.248-0.203,0.45-0.45,0.45H6.06c-0.248,0-0.45-0.203-0.45-0.45s0.203-0.45,0.45-0.45h7.879C14.187,6.848,14.39,7.051,14.39,7.298"></path>
+            </svg>
+            <svg id="floating-menu-close" ng-click="closeMenu()"  class="svg-icon" viewBox="0 0 20 20">
+                <path d="M10.185,1.417c-4.741,0-8.583,3.842-8.583,8.583c0,4.74,3.842,8.582,8.583,8.582S18.768,14.74,18.768,10C18.768,5.259,14.926,1.417,10.185,1.417 M10.185,17.68c-4.235,0-7.679-3.445-7.679-7.68c0-4.235,3.444-7.679,7.679-7.679S17.864,5.765,17.864,10C17.864,14.234,14.42,17.68,10.185,17.68 M10.824,10l2.842-2.844c0.178-0.176,0.178-0.46,0-0.637c-0.177-0.178-0.461-0.178-0.637,0l-2.844,2.841L7.341,6.52c-0.176-0.178-0.46-0.178-0.637,0c-0.178,0.176-0.178,0.461,0,0.637L9.546,10l-2.841,2.844c-0.178,0.176-0.178,0.461,0,0.637c0.178,0.178,0.459,0.178,0.637,0l2.844-2.841l2.844,2.841c0.178,0.178,0.459,0.178,0.637,0c0.178-0.176,0.178-0.461,0-0.637L10.824,10z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <style>
+        #floating-menu-container {
+            position: fixed;
+            z-index: 999998;
+            top: 25%;
+            left: -1%;
+        }
+        #floating-menu-container #floating-menu-close{
+            display: none;
+        }
+        #floating-menu-container.close  #floating-menu-open{
+            display: none;
+        }
+        #floating-menu-container.close  #floating-menu-close{
+            display: block;
+        }
+
+        #guac-menu {
+            background-color: #fff;
+        }
+
+        .pure-material-button-contained {
+            position: relative;
+            display: inline-block;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 4px;
+            padding: 0 16px;
+            min-width: 64px;
+            height: 36px;
+            vertical-align: middle;
+            text-align: center;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+            color: rgb(var(--pure-material-onprimary-rgb, 255, 255, 255));
+            background-color: rgb(var(--pure-material-primary-rgb, 33, 150, 243));
+            box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+            font-family: var(--pure-material-font, "Roboto", "Segoe UI", BlinkMacSystemFont, system-ui, -apple-system);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 36px;
+            overflow: hidden;
+            outline: none;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+        }
+
+        .pure-material-button-contained::-moz-focus-inner {
+            border: none;
+        }
+
+        /* Overlay */
+        .pure-material-button-contained::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgb(var(--pure-material-onprimary-rgb, 255, 255, 255));
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        /* Ripple */
+        .pure-material-button-contained::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            border-radius: 50%;
+            padding: 50%;
+            width: 32px; /* Safari */
+            height: 32px; /* Safari */
+            background-color: rgb(var(--pure-material-onprimary-rgb, 255, 255, 255));
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(1);
+            transition: opacity 1s, transform 0.5s;
+        }
+
+        /* Hover, Focus */
+        .pure-material-button-contained:hover,
+        .pure-material-button-contained:focus {
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .pure-material-button-contained:hover::before {
+            opacity: 0.08;
+        }
+
+        .pure-material-button-contained:focus::before {
+            opacity: 0.24;
+        }
+
+        .pure-material-button-contained:hover:focus::before {
+            opacity: 0.3;
+        }
+
+        /* Active */
+        .pure-material-button-contained:active {
+            box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+        }
+
+        .pure-material-button-contained:active::after {
+            opacity: 0.32;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0s;
+        }
+
+        /* Disabled */
+        .pure-material-button-contained:disabled {
+            color: rgba(var(--pure-material-onsurface-rgb, 0, 0, 0), 0.38);
+            background-color: rgba(var(--pure-material-onsurface-rgb, 0, 0, 0), 0.12);
+            box-shadow: none;
+            cursor: initial;
+        }
+
+        .pure-material-button-contained:disabled::before {
+            opacity: 0;
+        }
+
+        .pure-material-button-contained:disabled::after {
+            opacity: 0;
+        }
+
+        .svg-icon {
+            width: 3em;
+            height: 3em;
+            display: block;
+        }
+
+        .svg-icon path,
+        .svg-icon polygon,
+        .svg-icon rect {
+            fill: #fff;
+        }
+
+        .svg-icon circle {
+            stroke: #4691f6;
+            stroke-width: 1;
+        }
+
+    </style>
+
+    <script>
+
+        console.log('initializing float menu')
+        dragElement(document.getElementById("floating-menu-container"));
+
+        function dragElement(elmnt) {
+            let pos1 = 0,
+                pos2 = 0,
+                pos3 = 0,
+                pos4 = 0;
+            let LOGO = document.getElementById("floating-menu-logo");
+            elmnt.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+                elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+                LOGO.style.pointerEvents = "none";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+                LOGO.style.pointerEvents = "auto";
+            }
+        }
+
+        function openSessionMenu() {
+            var mel = document.getElementById("guac-menu");
+            var cel = document.getElementsByClassName("menu-content")[0];
+            var fel = document.getElementById("floating-menu-container");
+            mel.classList.add("open");
+            cel.classList.add("open");
+            fel.classList.add("close");
+        }
+
+        function closeSessionMenu() {
+            var mel = document.getElementById("guac-menu");
+            var cel = document.getElementsByClassName("menu-content")[0];
+            var fel = document.getElementById("floating-menu-container");
+            mel.classList.remove("open");
+            cel.classList.remove("open");
+            fel.classList.remove("close");
+        }
+    </script>
+
+    <!-- Client view -->
+    <div class="client-view">
+        <div class="client-view-content">
+
+            <!-- Central portion of view -->
+            <div class="client-body" guac-touch-drag="clientDrag" guac-touch-pinch="clientPinch">
+
+                <!-- Client for current connection -->
+                <guac-client client="client"></guac-client>
+
+                <!-- All other active connections -->
+                <div id="other-connections">
+                    <guac-client-panel clients="otherClients"></guac-client-panel>
+                </div>
+
+            </div>
+
+            <!-- Bottom portion of view -->
+            <div class="client-bottom">
+
+                <!-- Text input -->
+                <div class="text-input-container" ng-if="showTextInput">
+                    <guac-text-input></guac-text-input>
+                </div>
+
+                <!-- On-screen keyboard -->
+                <div class="keyboard-container" ng-if="showOSK">
+                    <guac-osk layout="'CLIENT.URL_OSK_LAYOUT' | translate"></guac-osk>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- File transfers -->
+    <div id="file-transfer-dialog" ng-show="hasTransfers()">
+        <guac-file-transfer-manager client="client"></guac-file-transfer-manager>
+    </div>
+
+    <!-- Connection stability warning -->
+    <div id="connection-warning" ng-show="isConnectionUnstable()">
+        {{'CLIENT.TEXT_CLIENT_STATUS_UNSTABLE' | translate}}
+    </div>
+
+    <!-- Menu -->
+    <div class="menu" ng-class="{open: menu.shown}" id="guac-menu">
+        <div class="menu-content" ng-if="menu.shown">
+
+            <!-- Stationary header -->
+            <div class="header" ng-if="false">
+                <h2 ng-hide="rootConnectionGroups">{{client.name}}</h2>
+                <h2 class="connection-select-menu" ng-show="rootConnectionGroups">
+                    <guac-menu menu-title="client.name" interactive="true">
+                        <div class="all-connections">
+                            <guac-group-list-filter connection-groups="rootConnectionGroups"
+                                filtered-connection-groups="filteredRootConnectionGroups"
+                                placeholder="'CLIENT.FIELD_PLACEHOLDER_FILTER' | translate"
+                                connection-properties="filteredConnectionProperties"
+                                connection-group-properties="filteredConnectionGroupProperties"></guac-group-list-filter>
+                            <guac-group-list
+                                connection-groups="filteredRootConnectionGroups"
+                                templates="{
+                                    'connection'       : 'app/client/templates/connection.html',
+                                    'connection-group' : 'app/client/templates/connectionGroup.html'
+                                }"
+                                page-size="10"></guac-group-list>
+                        </div>
+                    </guac-menu>
+                </h2>
+                <div class="share-menu" ng-show="canShareConnection()">
+                    <guac-menu menu-title="'CLIENT.ACTION_SHARE' | translate">
+                        <ul ng-repeat="sharingProfile in sharingProfiles">
+                            <li><a ng-click="share(sharingProfile)">{{sharingProfile.name}}</a></li>
+                        </ul>
+                    </guac-menu>
+                </div>
+                <guac-user-menu local-actions="clientMenuActions"></guac-user-menu>
+            </div>
+
+            <!-- Scrollable body -->
+            <div class="menu-body" guac-touch-drag="menuDrag" guac-scroll="menu.scrollState">
+
+                <!-- Connection sharing -->
+                <div class="menu-section" id="share-links" ng-show="isShared()" ng-if="false">
+                    <div class="content">
+                        <h3>{{'CLIENT.INFO_CONNECTION_SHARED' | translate}}</h3>
+                        <p class="description"
+                           translate="CLIENT.HELP_SHARE_LINK"
+                           translate-values="{LINKS : getShareLinkCount()}"></p>
+                        <table>
+                            <tr ng-repeat="link in client.shareLinks | toArray | orderBy: value.name">
+                                <th>{{link.value.name}}</th>
+                                <td><a href="{{link.value.href}}" target="_blank">{{link.value.href}}</a></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Disconnect button -->
+                <div class="menu-section" id="disconnet-session">
+                    <h3>Disconnect</h3>
+                    <div class="content">
+                        <button onclick="window.close();" class="pure-material-button-contained">Disconnect</button>
+                    </div>
+                </div>
+
+                <!-- Clipboard -->
+                <div class="menu-section" id="clipboard-settings">
+                    <h3>{{'CLIENT.SECTION_HEADER_CLIPBOARD' | translate}}</h3>
+                    <div class="content">
+                        <p class="description">{{'CLIENT.HELP_CLIPBOARD' | translate}}</p>
+                        <guac-clipboard data="client.clipboardData"></guac-clipboard>
+                    </div>
+                </div>
+
+                <!-- Devices -->
+                <div class="menu-section" id="devices" ng-show="client.filesystems.length">
+                    <h3>{{'CLIENT.SECTION_HEADER_DEVICES' | translate}}</h3>
+                    <div class="content">
+                        <div class="device filesystem" ng-repeat="filesystem in client.filesystems" ng-click="showFilesystemMenu(filesystem)">
+                            {{filesystem.name}}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Connection parameters which may be modified while the connection is open -->
+                <div class="menu-section connection-parameters" id="connection-settings" ng-show="client.protocol" ng-if="false">
+                    <guac-form namespace="getProtocolNamespace(client.protocol)"
+                               content="client.forms"
+                               model="menu.connectionParameters"
+                               model-only="true"></guac-form>
+                </div>
+
+                <!-- Input method -->
+                <div class="menu-section" id="keyboard-settings" ng-if="false">
+                    <h3>{{'CLIENT.SECTION_HEADER_INPUT_METHOD' | translate}}</h3>
+                    <div class="content">
+
+                        <!-- No IME -->
+                        <div class="choice">
+                            <label><input id="ime-none" name="input-method" ng-change="closeMenu()" ng-model="menu.inputMethod" type="radio" value="none"/> {{'CLIENT.NAME_INPUT_METHOD_NONE' | translate}}</label>
+                            <p class="caption"><label for="ime-none">{{'CLIENT.HELP_INPUT_METHOD_NONE' | translate}}</label></p>
+                        </div>
+
+                        <!-- Text input -->
+                        <div class="choice">
+                            <div class="figure"><label for="ime-text"><img src="images/settings/tablet-keys.png" alt=""/></label></div>
+                            <label><input id="ime-text" name="input-method" ng-change="closeMenu()" ng-model="menu.inputMethod" type="radio" value="text"/> {{'CLIENT.NAME_INPUT_METHOD_TEXT' | translate}}</label>
+                            <p class="caption"><label for="ime-text">{{'CLIENT.HELP_INPUT_METHOD_TEXT' | translate}} </label></p>
+                        </div>
+
+                        <!-- Guac OSK -->
+                        <div class="choice">
+                            <label><input id="ime-osk" name="input-method" ng-change="closeMenu()" ng-model="menu.inputMethod" type="radio" value="osk"/> {{'CLIENT.NAME_INPUT_METHOD_OSK' | translate}}</label>
+                            <p class="caption"><label for="ime-osk">{{'CLIENT.HELP_INPUT_METHOD_OSK' | translate}}</label></p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Mouse mode -->
+                <div class="menu-section" id="mouse-settings" ng-if="false">
+                    <h3>{{'CLIENT.SECTION_HEADER_MOUSE_MODE' | translate}}</h3>
+                    <div class="content">
+                        <p class="description">{{'CLIENT.HELP_MOUSE_MODE' | translate}}</p>
+
+                        <!-- Touchscreen -->
+                        <div class="choice">
+                            <input name="mouse-mode" ng-change="closeMenu()" ng-model="client.clientProperties.emulateAbsoluteMouse" type="radio" ng-value="true" checked="checked" id="absolute"/>
+                            <div class="figure">
+                                <label for="absolute"><img src="images/settings/touchscreen.png" alt="{{'CLIENT.NAME_MOUSE_MODE_ABSOLUTE' | translate}}"/></label>
+                                <p class="caption"><label for="absolute">{{'CLIENT.HELP_MOUSE_MODE_ABSOLUTE' | translate}}</label></p>
+                            </div>
+                        </div>
+
+                        <!-- Touchpad -->
+                        <div class="choice">
+                            <input name="mouse-mode" ng-change="closeMenu()" ng-model="client.clientProperties.emulateAbsoluteMouse" type="radio" ng-value="false" id="relative"/>
+                            <div class="figure">
+                                <label for="relative"><img src="images/settings/touchpad.png" alt="{{'CLIENT.NAME_MOUSE_MODE_RELATIVE' | translate}}"/></label>
+                                <p class="caption"><label for="relative">{{'CLIENT.HELP_MOUSE_MODE_RELATIVE' | translate}}</label></p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Display options -->
+                <div class="menu-section" id="display-settings">
+                    <h3>{{'CLIENT.SECTION_HEADER_DISPLAY' | translate}}</h3>
+                    <div class="content">
+                        <div id="zoom-settings" ng-if="false">
+                            <div ng-click="zoomOut()" id="zoom-out"><img src="images/settings/zoom-out.png" alt="-"/></div>
+                            <div class="zoom-ctrl">
+                                <input type="number" class="zoom-ctrl" guac-zoom-ctrl
+                                        ng-model="client.clientProperties.scale"
+                                        ng-model-options="{ updateOn: 'blur submit' }"
+                                        ng-change="zoomSet()" />%
+                            </div>
+                            <div ng-click="zoomIn()" id="zoom-in"><img src="images/settings/zoom-in.png" alt="+"/></div>
+                        </div>
+                        <div><label><input ng-model="menu.autoFit" ng-change="changeAutoFit()" ng-disabled="autoFitDisabled()" type="checkbox" id="auto-fit"/> {{'CLIENT.TEXT_ZOOM_AUTO_FIT' | translate}}</label></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Filesystem menu -->
+    <div id="filesystem-menu" class="menu" ng-class="{open: isFilesystemMenuShown()}">
+        <div class="menu-content">
+
+            <!-- Stationary header -->
+            <div class="header">
+                <h2>{{filesystemMenuContents.name}}</h2>
+                <button class="upload button" guac-upload="uploadFiles">{{'CLIENT.ACTION_UPLOAD_FILES' | translate}}</button>
+                <button class="back" ng-click="hideFilesystemMenu()">{{'CLIENT.ACTION_NAVIGATE_BACK' | translate}}</button>
+            </div>
+
+            <!-- Breadcrumbs -->
+            <div class="header breadcrumbs"><div
+                    class="breadcrumb root"
+                    ng-click="changeDirectory(filesystemMenuContents, filesystemMenuContents.root)"></div><div
+                        class="breadcrumb"
+                        ng-repeat="file in getPath(filesystemMenuContents.currentDirectory)"
+                        ng-click="changeDirectory(filesystemMenuContents, file)">{{file.name}}</div>
+            </div>
+
+            <!-- Scrollable body -->
+            <div class="menu-body">
+                <guac-file-browser client="client" filesystem="filesystemMenuContents"></guac-file-browser>
+            </div>
+
+        </div>
+    </div>
+
+</guac-viewport>
