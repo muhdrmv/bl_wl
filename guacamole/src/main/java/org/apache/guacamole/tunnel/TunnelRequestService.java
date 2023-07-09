@@ -28,12 +28,10 @@ import org.apache.guacamole.GuacamoleResourceNotFoundException;
 import org.apache.guacamole.GuacamoleSession;
 import org.apache.guacamole.GuacamoleUnauthorizedException;
 import org.apache.guacamole.net.GuacamoleTunnel;
-import org.apache.guacamole.net.auth.AuthenticatedUser;
-import org.apache.guacamole.net.auth.Connectable;
-import org.apache.guacamole.net.auth.Credentials;
-import org.apache.guacamole.net.auth.UserContext;
+import org.apache.guacamole.net.auth.*;
 import org.apache.guacamole.net.event.TunnelCloseEvent;
 import org.apache.guacamole.net.event.TunnelConnectEvent;
+import org.apache.guacamole.protocol.GuacamoleConfiguration;	
 import org.apache.guacamole.rest.auth.AuthenticationService;
 import org.apache.guacamole.protocol.GuacamoleClientInformation;
 import org.apache.guacamole.rest.event.ListenerService;
@@ -216,6 +214,16 @@ public class TunnelRequestService {
         GuacamoleTunnel tunnel = connectable.connect(info, tokens);
         logger.info("User \"{}\" connected to {} \"{}\".",
                 context.self().getIdentifier(), type.NAME, id);
+
+        // @rjp inject required params to tunnel	
+        tunnel.setTunnelRequestTypeName(type.NAME);	
+        if (connectable instanceof Connection) {	
+            Connection connection = (Connection) connectable;	
+            GuacamoleConfiguration configuration = connection.getConfiguration();	
+            tunnel.setConnectionConfiguration(configuration);	
+            tunnel.setTunnelRequestInfo(info);	
+        }
+        
         return tunnel;
 
     }

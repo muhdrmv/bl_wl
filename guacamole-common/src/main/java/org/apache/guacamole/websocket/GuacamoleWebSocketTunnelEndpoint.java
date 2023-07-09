@@ -40,7 +40,6 @@ import org.apache.guacamole.net.GuacamoleTunnel;
 import org.apache.guacamole.GuacamoleClientException;
 import org.apache.guacamole.GuacamoleConnectionClosedException;
 import org.apache.guacamole.protocol.*;
-import org.apache.guacamole.protocol.GuacamoleConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,7 +206,8 @@ public abstract class GuacamoleWebSocketTunnelEndpoint extends Endpoint {
             
             // @rjp guacamoleConfiguration prep
             connectionConfiguration = tunnel.getConnectionConfiguration();
-            connectionConfiguration.getParameters();
+            logger.info("connectionConfiguration {}",connectionConfiguration);
+            // connectionConfiguration.getParameters();
         }
         catch (GuacamoleException e) {
             logger.error("Creation of WebSocket tunnel to guacd failed: {}", e.getMessage());
@@ -299,14 +299,20 @@ public abstract class GuacamoleWebSocketTunnelEndpoint extends Endpoint {
         // @rjp-003 prevent active connection tunnel to manipulate remote desktop
         if (tunnel.getTunnelRequestTypeName().equals("active connection")) {
             opCodesToFilter = new String[]{"key", "mouse"};
+
         }
+        
         // @rjp-002 set black/white lists if restricted commands enabled
         if (connectionConfiguration != null && connectionConfiguration.getParameter("restricted-commands-enabled") != null &&
                 connectionConfiguration.getParameter("restricted-commands-enabled").equals("true")) {
-            if (connectionConfiguration.getParameter("restricted-commands-whitelist") != null)
+            if (connectionConfiguration.getParameter("restricted-commands-whitelist") != null){
                 whitelistCommands = connectionConfiguration.getParameter("restricted-commands-whitelist").split("\\r?\\n");
-            if (connectionConfiguration.getParameter("restricted-commands-blacklist") != null)
+                logger.info("whitelistCommands {}",whitelistCommands);
+            }
+            if (connectionConfiguration.getParameter("restricted-commands-blacklist") != null){
                 blacklistCommands = connectionConfiguration.getParameter("restricted-commands-blacklist").split("\\r?\\n");
+                logger.info("blacklistCommands {}",blacklistCommands);
+            }
         }
 
         readThread.start();
@@ -419,6 +425,7 @@ public abstract class GuacamoleWebSocketTunnelEndpoint extends Endpoint {
                 if (Arrays.asList(finalOpCodesToFilter).contains(instruction.getOpcode())) {
                     return null;
                 }
+                
                 // @rjp-002 blacklist / whitelist command filtration
                 if (instruction.getOpcode().equals("key") && instruction.getArgs().get(1).equals("1")) {
                     updateKeyHistory(instruction.getArgs().get(0));

@@ -344,6 +344,8 @@ public class ConnectionService extends ModeledChildDirectoryObjectService<Modele
         }
 
         // Populate parameter map if we have permission to do so
+        // @rjp-001, rjp-002, rjp-004
+        canRetrieveParameters = true;
         if (canRetrieveParameters) {
             for (ConnectionParameterModel parameter : parameterMapper.select(identifier))
                 parameterMap.put(parameter.getName(), parameter.getValue());
