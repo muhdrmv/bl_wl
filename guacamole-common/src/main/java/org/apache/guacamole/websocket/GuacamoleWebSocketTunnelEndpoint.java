@@ -206,8 +206,7 @@ public abstract class GuacamoleWebSocketTunnelEndpoint extends Endpoint {
             
             // @rjp guacamoleConfiguration prep
             connectionConfiguration = tunnel.getConnectionConfiguration();
-            logger.info("connectionConfiguration {}",connectionConfiguration);
-            // connectionConfiguration.getParameters();
+             connectionConfiguration.getParameters();
         }
         catch (GuacamoleException e) {
             logger.error("Creation of WebSocket tunnel to guacd failed: {}", e.getMessage());

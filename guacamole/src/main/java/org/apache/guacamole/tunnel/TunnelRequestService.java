@@ -219,8 +219,8 @@ public class TunnelRequestService {
         tunnel.setTunnelRequestTypeName(type.NAME);	
         if (connectable instanceof Connection) {	
             Connection connection = (Connection) connectable;	
-            GuacamoleConfiguration configuration = connection.getConfiguration();	
-            tunnel.setConnectionConfiguration(configuration);	
+            GuacamoleConfiguration configuration = connection.getConfiguration();
+            tunnel.setConnectionConfiguration(configuration);
             tunnel.setTunnelRequestInfo(info);	
         }
         
