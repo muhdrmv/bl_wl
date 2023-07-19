@@ -305,11 +305,11 @@ public abstract class GuacamoleWebSocketTunnelEndpoint extends Endpoint {
         if (connectionConfiguration != null && connectionConfiguration.getParameter("restricted-commands-enabled") != null &&
                 connectionConfiguration.getParameter("restricted-commands-enabled").equals("true")) {
             if (connectionConfiguration.getParameter("restricted-commands-whitelist") != null){
-                whitelistCommands = connectionConfiguration.getParameter("restricted-commands-whitelist").split("\\r?\\n");
+                whitelistCommands = connectionConfiguration.getParameter("restricted-commands-whitelist").split(",");
                 logger.info("whitelistCommands {}",whitelistCommands);
             }
             if (connectionConfiguration.getParameter("restricted-commands-blacklist") != null){
-                blacklistCommands = connectionConfiguration.getParameter("restricted-commands-blacklist").split("\\r?\\n");
+                blacklistCommands = connectionConfiguration.getParameter("restricted-commands-blacklist").split(",");
                 logger.info("blacklistCommands {}",blacklistCommands);
             }
         }

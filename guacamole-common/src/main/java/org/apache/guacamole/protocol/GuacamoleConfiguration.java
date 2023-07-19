@@ -72,9 +72,11 @@ public class GuacamoleConfiguration implements Serializable {
         // Copy protocol and connection ID
         protocol = config.getProtocol();
         connectionID = config.getConnectionID();
+
         // Copy parameter values
         for (String name : config.getParameterNames())
             parameters.put(name, config.getParameter(name));
+
     }
 
     /**
